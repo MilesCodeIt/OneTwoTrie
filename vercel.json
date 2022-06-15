@@ -1,5 +1,9 @@
 {
     "version": 2,
+    "github": {
+      "silent": true,
+      "enabled": false
+    }
     "functions": {
         "api/index.php": { "runtime": "vercel-php@0.5.1" }
     },
