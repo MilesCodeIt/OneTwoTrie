@@ -2,9 +2,9 @@ name: Deploy
 
 on:
   push:
-    paths:
-      - "sources/**"
-      - "!sources/README.md"
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
 
 jobs:
   deploy:
