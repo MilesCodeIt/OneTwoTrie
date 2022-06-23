@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,32 +31,64 @@ Route::post('search', function (Request $request){
         ];
     }
 
-
-    if(!$query['query']){
+    if(!implode($query)){
         return [
             'success' => false,
-            'message' => 'empty query !'
+            'message' => 'empty query !',
         ];
     }
 
+    $query = implode($query);
 
 
     $result = DB::table('products')
         ->where('barcode',$query)
-        ->orWhere('name','LIKE','%'.implode($query).'%')
+        ->orWhere('name','LIKE','%'.$query.'%')
         ->take(10)
-        ->get();
+        ->get()
+        ->toArray();
+
+
 
     if(!$result){
         return [
             'success' => false,
-            'message' => 'query not found in the db !'
+            'message' => 'no result found',
         ];
     }
 
     return [
         'success' => true,
         'data' => $result,
-        'query' => $query['query'],
+        'query' => $query,
     ];
+
+
+//    if(!$query['query']){
+//        return [
+//            'success' => false,
+//            'message' => 'empty query !'
+//        ];
+//    }
+//
+//
+//
+//    $result = DB::table('products')
+//        ->where('barcode',$query)
+//        ->orWhere('name','LIKE','%'.implode($query).'%')
+//        ->take(10)
+//        ->get();
+//
+//    if(!$result){
+//        return [
+//            'success' => false,
+//            'message' => 'query not found in the db !'
+//        ];
+//    }
+//
+//    return [
+//        'success' => true,
+//        'data' => $result,
+//        'query' => $query['query'],
+//    ];
 });

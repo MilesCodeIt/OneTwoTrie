@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Client;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -14,22 +14,64 @@ class ProductController extends Controller
     {
         return view('welcome');
     }
+
+    private function searchInDb($query): array
+    {
+        if(!$query){
+            return [
+                'success' => false,
+                'message' => 'empty query !',
+                'error_code' => 400
+            ];
+        }
+
+
+        $result = DB::table('products')
+            ->where('barcode',$query)
+            ->orWhere('name','LIKE','%'.$query.'%')
+            ->take(10)
+            ->get()
+            ->toArray();
+
+
+
+        if(!$result){
+            return [
+                'success' => false,
+                'message' => 'no result found',
+                'error_code' => 404
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => $result,
+        ];
+    }
+
     public function search(Request $request): Factory|View|Application
     {
-        $searchQuery = $request->query('q');
-
-        $client = new Client();
-        $url = config('app.url').'api/search';
 
 
-        $request = $client->post($url, [
-            'query' => $searchQuery,
-        ]);
-        $response = $request.send();
+        $query = $request->query('q');
 
-        dd($response);
+        $result = $this->searchInDb($query);
+
+        if(!$result['success']){
+            return view('search',
+                [
+                    'success' => false,
+                    'error_code' => $result['error_code']
+                ]
+            );
+        }
 
 
-        return view('search', ['query' => $searchQuery]);
+        return view('search',
+            [
+                'success' => true,
+                'result' => $result['data']
+            ]
+        );
     }
 }

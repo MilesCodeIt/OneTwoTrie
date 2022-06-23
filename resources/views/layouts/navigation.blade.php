@@ -82,7 +82,7 @@
                         Login
                     </x-nav-dropdown-item>
                     <x-nav-dropdown-item href="{{ route('register') }}">
-                        register
+                        Register
                     </x-nav-dropdown-item>
                 @endguest
             </x-nav-dropdown-group>
