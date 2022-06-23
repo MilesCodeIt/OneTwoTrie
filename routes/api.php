@@ -17,3 +17,44 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('search', function (Request $request){
+
+    $query = $request->query();
+
+    if(!$query){
+        return [
+            'success' => false,
+            'message' => 'no query sent !'
+        ];
+    }
+
+
+    if(!$query['query']){
+        return [
+            'success' => false,
+            'message' => 'empty query !'
+        ];
+    }
+
+
+
+    $result = DB::table('products')
+        ->where('barcode',$query)
+        ->orWhere('name','LIKE','%'.implode($query).'%')
+        ->take(10)
+        ->get();
+
+    if(!$result){
+        return [
+            'success' => false,
+            'message' => 'query not found in the db !'
+        ];
+    }
+
+    return [
+        'success' => true,
+        'data' => $result,
+        'query' => $query['query'],
+    ];
+});
